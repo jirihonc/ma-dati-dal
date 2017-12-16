@@ -22,8 +22,8 @@
  -->
 
           <div class="card"  v-for="payer in payers" v-bind:key="payer.idx">
-            <input type="text" placeholder="jméno" v-model="payer.name" />
-            <input type="number" placeholder="zaplatil" v-model="payer.val" />
+            <input type="text" class="nameInp" placeholder="jméno" v-model="payer.name" />
+            <input type="number" class="paidInp" placeholder="zaplatil" v-model="payer.val" />
           </div>
           
         </div>
