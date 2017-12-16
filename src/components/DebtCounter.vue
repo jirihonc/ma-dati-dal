@@ -29,7 +29,7 @@
         </div>
         
         <div class="rightcolumn">
-          <h2>Výsledky: {{ debtAvg }}</h2>
+          <h2>Výsledky</h2>
           <div class="card">
             
 
@@ -39,22 +39,11 @@
                 <th>Komu</th>
                 <th>Kolik</th>
               </tr>
-              <tr>
-                <td>Jirka</td>
-                <td>Eve</td>
-                <td>200,-</td>
+              <tr v-for="result in results" v-bind:key="result.idx">
+                <td>{{ result.who }}</td>
+                <td>{{ result.whom }}</td>
+                <td>{{ result.val }},-</td>
               </tr>
-              <tr>
-                <td>Jirka</td>
-                <td>Martine</td>
-                <td>150,-</td>
-              </tr>
-              <tr>
-                <td>Marek</td>
-                <td>Eve</td>
-                <td>100,-</td>
-              </tr>
-
             </table>
 
           </div>
@@ -72,6 +61,7 @@ import Payer from './Payer.vue'
 
 var initPayerCount = 4
 var allPayers = []
+var whoToWhom = []
 
 var step
 for (step = 0; step < initPayerCount; step++) {
@@ -98,9 +88,84 @@ export default {
       for (idx = 0; idx < this.payers.length; idx++) {
         sum += Number(this.payers[idx].val)
       }
-      this.debtAvg = sum / this.payers.length
+      var debtAvg = sum / this.payers.length
 
-      console.log('sum: ' + sum + ', avg: ' + this.debtAvg)
+      console.log('sum: ' + sum + ', avg: ' + debtAvg)
+
+      var debts = []
+      var toPay = []
+
+      var dIdx = 0
+      var pIdx = 0
+
+      for (idx = 0; idx < this.payers.length; idx++) {
+        var payerPaid = Number(this.payers[idx].val)
+        var payerName = this.payers[idx].name
+        var value = payerPaid - debtAvg
+
+        if (value < 0) {
+          debts[dIdx++] = {name: payerName, val: value}
+        } else if (value > 0) {
+          toPay[pIdx++] = {name: payerName, val: value}
+          console.log('toPay: ' + payerPaid + ', :' + value)
+        }
+      }
+
+      // let's sort them from most to less
+      toPay.sort(function (a, b ){ return (a.val > b.val) ? -1 : ((b.val > a.val) ? 1 : 0) })
+
+      console.log('Calculating results')
+
+      dIdx = 0
+      pIdx = 0
+      var rIdx = 0
+      this.results = []
+      var toPayLen = toPay.length
+      var debtLen = debts.length
+
+      while (pIdx < toPayLen && dIdx < debtLen) {
+        var debtInst = debts[dIdx]
+        var debt = debtInst.val
+
+        console.log('debt: ' + debt)
+
+        if (debt !== 0) {
+
+          var toPayInst = toPay[pIdx];
+
+          console.log('toPay: ' + toPayInst + ', for idx: ' + pIdx)
+          
+          var toPayVal = toPayInst.val
+          
+          
+          if (toPayVal > 0) {
+
+            var maxToPay = Math.min(Math.abs(debt), toPayVal)
+
+            this.results[rIdx] = {idx: rIdx, who: debtInst.name, whom: toPayInst.name, val: maxToPay}
+            rIdx++
+
+            console.log('maxToPay: ' + maxToPay + ', debtInst.val: ' + debtInst.val + ', toPayInst.val: ' + toPayInst.val)
+            
+            debtInst.val = debtInst.val + maxToPay
+            toPayInst.val = toPayInst.val - maxToPay
+
+          } else {
+            pIdx++
+            console.log('incr P: ' + dIdx)
+          }
+        } else {
+          dIdx++
+          console.log('incr D: ' + dIdx)
+        }
+
+        console.log('pIdx: ' + pIdx + ': ' + toPayLen + ', dIdx: ' + dIdx + ': ' + debtLen)
+      }
+
+      for (idx = 0; idx < this.results.length; idx++) {
+        var resIns = this.results[idx];
+        console.log(resIns.who + ' -> ' + resIns.whom + ': ' + resIns.val + ',-')
+      }
     }
   },
   data () {
@@ -108,7 +173,7 @@ export default {
       msg: 'Má dáti, dal',
       pCount: initPayerCount,
       payers: allPayers,
-      debtAvg: 0.0
+      results: whoToWhom
     }
   }
 }
