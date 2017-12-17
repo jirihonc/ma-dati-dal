@@ -112,7 +112,9 @@ export default {
       }
 
       // let's sort them from most to less
-      toPay.sort(function (a, b ){ return (a.val > b.val) ? -1 : ((b.val > a.val) ? 1 : 0) })
+      toPay.sort(function (a, b) {
+        return (a.val > b.val) ? -1 : ((b.val > a.val) ? 1 : 0)
+      })
 
       console.log('Calculating results')
 
@@ -127,44 +129,23 @@ export default {
         var debtInst = debts[dIdx]
         var debt = debtInst.val
 
-        console.log('debt: ' + debt)
-
         if (debt !== 0) {
-
-          var toPayInst = toPay[pIdx];
-
-          console.log('toPay: ' + toPayInst + ', for idx: ' + pIdx)
-          
+          var toPayInst = toPay[pIdx]
           var toPayVal = toPayInst.val
-          
-          
           if (toPayVal > 0) {
-
             var maxToPay = Math.min(Math.abs(debt), toPayVal)
 
             this.results[rIdx] = {idx: rIdx, who: debtInst.name, whom: toPayInst.name, val: maxToPay}
             rIdx++
 
-            console.log('maxToPay: ' + maxToPay + ', debtInst.val: ' + debtInst.val + ', toPayInst.val: ' + toPayInst.val)
-            
             debtInst.val = debtInst.val + maxToPay
             toPayInst.val = toPayInst.val - maxToPay
-
           } else {
             pIdx++
-            console.log('incr P: ' + dIdx)
           }
         } else {
           dIdx++
-          console.log('incr D: ' + dIdx)
         }
-
-        console.log('pIdx: ' + pIdx + ': ' + toPayLen + ', dIdx: ' + dIdx + ': ' + debtLen)
-      }
-
-      for (idx = 0; idx < this.results.length; idx++) {
-        var resIns = this.results[idx];
-        console.log(resIns.who + ' -> ' + resIns.whom + ': ' + resIns.val + ',-')
       }
     }
   },
