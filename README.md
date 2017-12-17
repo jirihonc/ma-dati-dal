@@ -2,16 +2,6 @@
 
 > Calculate who should give money top whom
 
-## Prereqisities
-# install vue-cli
-$ npm install --global vue-cli
-# create a new project using the "webpack" template
-$ vue init webpack my-project
-# install dependencies and go!
-$ cd my-project
-$ npm install
-$ npm run dev
-
 ## Build Setup
 
 ``` bash
