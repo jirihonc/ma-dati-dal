@@ -85,10 +85,20 @@ export default {
     countDebts () {
       var idx = 0
       var sum = 0
+      var acceptedLength = 0
+
       for (idx = 0; idx < this.payers.length; idx++) {
-        sum += Number(this.payers[idx].val)
+        var pPaid = Number(this.payers[idx].val)
+        var pName = this.payers[idx].name
+
+        sum += pPaid
+
+        if (pName || pPaid > 0) {
+          acceptedLength++
+        }
       }
-      var debtAvg = sum / this.payers.length
+
+      var debtAvg = Number(sum / acceptedLength).toFixed(2)
 
       console.log('sum: ' + sum + ', avg: ' + debtAvg)
 
@@ -101,13 +111,17 @@ export default {
       for (idx = 0; idx < this.payers.length; idx++) {
         var payerPaid = Number(this.payers[idx].val)
         var payerName = this.payers[idx].name
-        var value = payerPaid - debtAvg
+        if (payerName || payerPaid > 0) {
+          var value = Number(payerPaid - debtAvg).toFixed(2)
 
-        if (value < 0) {
-          debts[dIdx++] = {name: payerName, val: value}
-        } else if (value > 0) {
-          toPay[pIdx++] = {name: payerName, val: value}
-          console.log('toPay: ' + payerPaid + ', :' + value)
+          console.log('value = ' + value + ' for: ' + payerName + ', payerPaid: ' + payerPaid)
+
+          if (value < 0) {
+            debts[dIdx++] = {name: payerName, val: value}
+          } else if (value > 0) {
+            toPay[pIdx++] = {name: payerName, val: value}
+            console.log('toPay: ' + payerPaid + ', :' + value)
+          }
         }
       }
 
@@ -127,19 +141,19 @@ export default {
 
       while (pIdx < toPayLen && dIdx < debtLen) {
         var debtInst = debts[dIdx]
-        var debt = debtInst.val
+        var debt = Number(debtInst.val)
 
-        if (debt !== 0) {
+        if (debt !== 0 && Math.abs(debt) > 0.01) {
           var toPayInst = toPay[pIdx]
-          var toPayVal = toPayInst.val
+          var toPayVal = Number(toPayInst.val)
           if (toPayVal > 0) {
-            var maxToPay = Math.min(Math.abs(debt), toPayVal)
+            var maxToPay = Math.min(Math.abs(debt), toPayVal).toFixed(2)
 
             this.results[rIdx] = {idx: rIdx, who: debtInst.name, whom: toPayInst.name, val: maxToPay}
             rIdx++
 
-            debtInst.val = debtInst.val + maxToPay
-            toPayInst.val = toPayInst.val - maxToPay
+            debtInst.val = Number(debtInst.val) + Number(maxToPay)
+            toPayInst.val = Number(toPayInst.val) - Number(maxToPay)
           } else {
             pIdx++
           }
